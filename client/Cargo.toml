@@ -1,0 +1,38 @@
+[package]
+name = "richat-client"
+version = "2.1.0"
+authors = { workspace = true }
+edition = { workspace = true }
+description = "Richat Client Library"
+homepage = { workspace = true }
+repository = { workspace = true }
+license = "Apache-2.0"
+keywords = { workspace = true }
+publish = true
+
+[dependencies]
+bytes = { workspace = true }
+futures = { workspace = true }
+humantime-serde = { workspace = true }
+pin-project-lite = { workspace = true }
+prost = { workspace = true }
+quinn = { workspace = true }
+richat-proto = { workspace = true }
+richat-shared = { workspace = true }
+rustls = { workspace = true }
+rustls-native-certs = { workspace = true }
+rustls-pemfile = { workspace = true }
+serde = { workspace = true }
+solana-sdk = { workspace = true }
+thiserror = { workspace = true }
+tokio = { workspace = true, features = ["rt-multi-thread", "fs"] }
+tonic = { workspace = true, features = ["tls-native-roots"] }
+tracing = { workspace = true }
+webpki-roots = { workspace = true }
+
+[build-dependencies]
+anyhow = { workspace = true }
+tonic-build = { workspace = true }
+
+[lints]
+workspace = true

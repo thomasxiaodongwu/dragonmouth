@@ -1,0 +1,14 @@
+# Project
+plugin-agave/config-test.json
+plugin-agave/fixtures/blocks
+richat/config-test.yml
+
+# Solana
+test-ledger
+
+# Rust
+target
+
+# IDE
+.idea
+.vscode

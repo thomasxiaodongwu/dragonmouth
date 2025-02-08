@@ -1,0 +1,47 @@
+[package]
+name = "richat"
+version = "2.1.0"
+authors = { workspace = true }
+edition = { workspace = true }
+description = "Richat App"
+homepage = { workspace = true }
+repository = { workspace = true }
+license = { workspace = true }
+keywords = { workspace = true }
+publish = { workspace = true }
+
+[dependencies]
+affinity = { workspace = true }
+anyhow = { workspace = true }
+clap = { workspace = true, features = ["derive"] }
+futures = { workspace = true }
+humantime-serde = { workspace = true }
+json5 = { workspace = true }
+lazy_static = { workspace = true }
+prometheus = { workspace = true }
+prost = { workspace = true }
+richat-client = { workspace = true }
+richat-filter = { workspace = true }
+richat-proto = { workspace = true }
+richat-shared = { workspace = true }
+serde = { workspace = true, features = ["derive"] }
+serde_yaml = { workspace = true }
+signal-hook = { workspace = true }
+smallvec = { workspace = true }
+solana-nohash-hasher = { workspace = true }
+solana-sdk = { workspace = true }
+thiserror = { workspace = true }
+tokio = { workspace = true }
+tonic = { workspace = true }
+tracing = { workspace = true }
+tracing-subscriber = { workspace = true, features = ["ansi", "env-filter", "json"] }
+
+[build-dependencies]
+anyhow = { workspace = true }
+cargo-lock = { workspace = true }
+git-version = { workspace = true }
+tonic-build = { workspace = true }
+vergen = { workspace = true, features = ["build", "rustc"] }
+
+[lints]
+workspace = true

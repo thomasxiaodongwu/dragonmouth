@@ -1,0 +1,67 @@
+[package]
+name = "richat-plugin-agave"
+version = "2.0.0"
+authors = { workspace = true }
+edition = { workspace = true }
+description = "Richat Agave Geyser Plugin"
+homepage = { workspace = true }
+repository = { workspace = true }
+license = { workspace = true }
+keywords = { workspace = true }
+publish = { workspace = true }
+
+[lib]
+crate-type = ["cdylib", "rlib"]
+
+[[bin]]
+name = "richat-plugin-config-check"
+path = "src/bin/config-check.rs"
+
+[[bench]]
+name = "encode"
+harness = false
+required-features = ["fixtures"]
+
+[dependencies]
+affinity = { workspace = true }
+agave-geyser-plugin-interface = { workspace = true }
+anyhow = { workspace = true }
+bincode = { workspace = true }
+bytes = { workspace = true }
+clap = { workspace = true, features = ["derive"] }
+futures = { workspace = true }
+lazy_static = { workspace = true }
+log = { workspace = true }
+prometheus = { workspace = true }
+prost = { workspace = true }
+prost_011 = { workspace = true, optional = true }
+prost-types = { workspace = true }
+richat-proto = { workspace = true }
+richat-shared = { workspace = true }
+serde = { workspace = true, features = ["derive"] }
+serde_json = { workspace = true }
+smallvec = { workspace = true }
+solana-account-decoder = { workspace = true }
+solana-logger = { workspace = true }
+solana-sdk = { workspace = true }
+solana-storage-proto = { workspace = true, optional = true }
+solana-transaction-status = { workspace = true }
+tokio = { workspace = true, features = ["rt-multi-thread", "macros"] }
+
+[dev-dependencies]
+criterion = { workspace = true }
+prost_011 = { workspace = true }
+richat-proto = { workspace = true, features = ["yellowstone-grpc-plugin"] }
+solana-storage-proto = { workspace = true }
+
+[build-dependencies]
+anyhow = { workspace = true }
+cargo-lock = { workspace = true }
+git-version = { workspace = true }
+vergen = { workspace = true, features = ["build", "rustc"] }
+
+[features]
+fixtures = ["dep:prost_011", "dep:solana-storage-proto"]
+
+[lints]
+workspace = true
