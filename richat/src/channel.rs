@@ -22,6 +22,7 @@ use {
             Arc, Mutex, MutexGuard, RwLock, RwLockReadGuard, RwLockWriteGuard,
         },
     },
+    tracing::{error, info},
 };
 
 #[derive(Debug, Clone)]
@@ -186,6 +187,7 @@ impl Messages {
     ) -> anyhow::Result<BoxStream<'static, Result<Vec<u8>, ReceiveError>>> {
         Ok(match config {
             ConfigChannelSource::Quic(config) => {
+                info!("Connecting to QUIC source");
                 config.connect().await?.subscribe(None, None).await?.boxed()
             }
             ConfigChannelSource::Tcp(config) => {

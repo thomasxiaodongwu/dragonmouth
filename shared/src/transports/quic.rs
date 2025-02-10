@@ -1,3 +1,4 @@
+use tracing::warn;
 use {
     crate::{
         config::deserialize_x_token_set,
@@ -174,9 +175,12 @@ impl ConfigQuicServer {
         transport_config
             .max_idle_timeout(self.max_idle_timeout.map(|ms| VarInt::from_u32(ms).into()));
 
-        Endpoint::server(server_config, self.endpoint).map_err(|error| CreateEndpointError::Bind {
-            error,
-            endpoint: self.endpoint,
+        Endpoint::server(server_config, self.endpoint).map_err(|error| {
+            warn!("failed to bind {}: {}", self.endpoint, error);
+            CreateEndpointError::Bind {
+                error,
+                endpoint: self.endpoint,
+            }
         })
     }
 }

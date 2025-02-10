@@ -44,6 +44,7 @@ use {
         io::{AsyncReadExt, AsyncWriteExt},
         net::{lookup_host, ToSocketAddrs},
     },
+    tracing::{error, info},
 };
 
 /// Dummy certificate verifier that treats any certificate as valid.
@@ -181,6 +182,7 @@ impl ConfigQuicClient {
             .set_x_token(self.x_token);
 
         if self.insecure {
+            info!("Connecting to {} (insecure)", self.endpoint);
             builder.insecure().connect(self.endpoint.clone()).await
         } else {
             builder
@@ -430,6 +432,7 @@ impl QuicClient {
         replay_from_slot: Option<Slot>,
         filter: Option<RichatFilter>,
     ) -> Result<QuicClientStream, SubscribeError> {
+        info!("Subscribing to server");
         let message = QuicSubscribeRequest {
             x_token: self.x_token,
             recv_streams: self.recv_streams,

@@ -62,6 +62,7 @@ fn main() -> anyhow::Result<()> {
                             message = stream.next() => match message {
                                 Some(Ok(message)) => {
                                     let mut maybe_message = Some(message);
+                                    // info!("received message: {:?}", maybe_message);
                                     loop {
                                         let Some(message) = maybe_message.take() else {
                                             break;
