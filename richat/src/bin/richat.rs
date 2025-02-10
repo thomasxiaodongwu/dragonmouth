@@ -82,8 +82,7 @@ fn main() -> anyhow::Result<()> {
             }
         })?;
 
-    // Create parser channel
-    let messages = channel::Messages::new(config.channel.config, config.apps.grpc.is_some());
+    /*let messages = channel::Messages::new(config.channel.config, config.apps.grpc.is_some());
     let parser_jh = thread::Builder::new()
         .name("richatParser".to_owned())
         .spawn({
@@ -108,8 +107,6 @@ fn main() -> anyhow::Result<()> {
                 Ok::<(), anyhow::Error>(())
             }
         })?;
-
-    // Create runtime for incoming connections
     let apps_jh = thread::Builder::new().name("richatApp".to_owned()).spawn({
         let shutdown = shutdown.clone();
         move || {
@@ -135,13 +132,13 @@ fn main() -> anyhow::Result<()> {
                     .map(|_| ())
             })
         }
-    })?;
+    })?;*/
 
     let mut signals = Signals::new([SIGINT])?;
     let mut threads = [
         ("source", Some(source_jh)),
-        ("parser", Some(parser_jh)),
-        ("apps", Some(apps_jh)),
+        // ("parser", Some(parser_jh)),
+        // ("apps", Some(apps_jh)),
     ];
     'outer: while threads.iter().any(|th| th.1.is_some()) {
         for signal in signals.pending() {
