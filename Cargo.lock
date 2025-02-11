@@ -3418,6 +3418,7 @@ dependencies = [
  "anyhow",
  "cargo-lock",
  "clap",
+ "crc32fast",
  "futures",
  "git-version",
  "humantime-serde",

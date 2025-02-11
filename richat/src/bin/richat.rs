@@ -63,6 +63,7 @@ fn main() -> anyhow::Result<()> {
                                 Some(Ok(message)) => {
                                     let mut maybe_message = Some(message);
                                     // info!("received message: {:?}", maybe_message);
+                                    info!("received message: id={:?}, process_id={:?}, thread_id={:?}", maybe_message.as_ref().map(|msg| format!("{:x}", crc32fast::hash(msg))), std::process::id(), std::thread::current().id());
                                     loop {
                                         let Some(message) = maybe_message.take() else {
                                             break;
