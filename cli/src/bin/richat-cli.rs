@@ -1,3 +1,9 @@
+#[cfg(unix)]
+use tokio::signal::unix::{signal, SignalKind};
+use std::pin::Pin;
+use std::task::Poll;
+use futures::Stream;
+use futures::task::noop_waker_ref;
 use {
     agave_geyser_plugin_interface::geyser_plugin_interface::{
         ReplicaAccountInfoV3, ReplicaBlockInfoV4, ReplicaEntryInfoV2, ReplicaTransactionInfoV2,
@@ -610,6 +616,9 @@ async fn main() -> anyhow::Result<()> {
     );
     env_logger::init();
 
+    let mut sigint = signal(SignalKind::interrupt()).expect("Failed to set up SIGINT handler");
+    let mut sighup = signal(SignalKind::hangup()).expect("Failed to set up SIGHUP handler");
+
     let args = Args::parse();
 
     let pb_multi = Arc::new(MultiProgress::new());
@@ -661,7 +670,13 @@ async fn main() -> anyhow::Result<()> {
     };
 
     tokio::pin!(stream);
-    while let Some(message) = stream.next().await {
+
+    let waker = noop_waker_ref();
+    let mut cx = std::task::Context::from_waker(waker);
+    while Pin::new(&mut stream).poll_next(&mut cx).is_ready() {
+        // 这里可以执行逻辑，但因为是空流，实际上什么都不会做
+    }
+    /*while let Some(message) = stream.next().await {
         match message {
             Ok(msg) => {
                 if args.stats {
@@ -810,7 +825,15 @@ async fn main() -> anyhow::Result<()> {
                 break;
             }
         }
+    }*/
+    tokio::select! {
+        _ = sigint.recv() => {
+            println!("Received SIGINT (Ctrl+C).");
+        }
+        _ = sighup.recv() => {
+            println!("Received SIGHUP (Terminal closed).");
+        }
     }
-    info!("stream closed");
+    // info!("stream closed");
     Ok(())
 }

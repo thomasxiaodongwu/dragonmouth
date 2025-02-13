@@ -46,7 +46,6 @@ use {
     },
     tracing::{error, info},
 };
-
 /// Dummy certificate verifier that treats any certificate as valid.
 /// NOTE, such verification is vulnerable to MITM attacks, but convenient for testing.
 #[derive(Debug)]
@@ -510,12 +509,59 @@ impl QuicClientStream {
     pub fn into_parsed(self) -> SubscribeStream {
         SubscribeStream::new(self.boxed())
     }
+
+    async fn process_reader(
+        index: usize,
+        reader: &mut QuicClientStreamReader,
+    ) {
+        println!("Reader {} started!", index);
+
+        while let Some(item) = reader.next().await {
+            match item {
+                Ok((received_msg_id, msg)) => {
+                    // println!("Reader {} - Received message {}: {:?}", index, received_msg_id, msg);
+                    println!("Reader {} - Received message {}", index, received_msg_id);
+                }
+                Err(err) => {
+                    println!("Reader {} - Error: {}", index, err);
+                    break;
+                }
+            }
+        }
+
+        println!("Reader {} finished!", index);
+    }
 }
 
 impl Stream for QuicClientStream {
     type Item = Result<Vec<u8>, ReceiveError>;
 
-    fn poll_next(self: Pin<&mut Self>, cx: &mut Context<'_>) -> Poll<Option<Self::Item>> {
+    fn poll_next(self: Pin<&mut Self>, _cx: &mut Context<'_>) -> Poll<Option<Self::Item>> {
+        let mut me = self.project();
+
+        // 如果任务已经启动，直接返回 None，表示不返回数据
+        if *me.index == usize::MAX {
+            return Poll::Ready(None);
+        }
+
+        // 启动每个 reader 的异步任务
+        while let Some(mut reader) = me.readers.pop() {
+            let index = *me.index; // 当前 reader 的索引
+            *me.index += 1;
+
+            tokio::spawn(async move {
+                QuicClientStream::process_reader(index, &mut reader).await;
+            });
+        }
+
+        // 标记任务已全部启动
+        *me.index = usize::MAX;
+
+        // 不再返回数据，直接返回 None
+        Poll::Ready(None)
+    }
+
+    /*fn poll_next(self: Pin<&mut Self>, cx: &mut Context<'_>) -> Poll<Option<Self::Item>> {
         let mut me = self.project();
 
         if let Some(msg) = me.messages.remove(me.msg_id) {
@@ -548,7 +594,7 @@ impl Stream for QuicClientStream {
                 return Poll::Pending;
             }
         }
-    }
+    }*/
 }
 
 pin_project! {
