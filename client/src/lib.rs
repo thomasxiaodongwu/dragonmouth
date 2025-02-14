@@ -3,3 +3,4 @@ pub mod grpc;
 pub mod quic;
 pub mod stream;
 pub mod tcp;
+mod kafka;

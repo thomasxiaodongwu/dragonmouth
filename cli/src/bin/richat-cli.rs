@@ -616,8 +616,8 @@ async fn main() -> anyhow::Result<()> {
     );
     env_logger::init();
 
-    let mut sigint = signal(SignalKind::interrupt()).expect("Failed to set up SIGINT handler");
-    let mut sighup = signal(SignalKind::hangup()).expect("Failed to set up SIGHUP handler");
+    //let mut sigint = signal(SignalKind::interrupt()).expect("Failed to set up SIGINT handler");
+    //let mut sighup = signal(SignalKind::hangup()).expect("Failed to set up SIGHUP handler");
 
     let args = Args::parse();
 
@@ -827,6 +827,12 @@ async fn main() -> anyhow::Result<()> {
         }
     }*/
     tokio::select! {
+        _ = tokio::signal::ctrl_c() => {
+            println!("Received Ctrl+C, shutting down...");
+        }
+        _ = tokio::time::sleep(tokio::time::Duration::MAX) => {},
+    }
+    /*tokio::select! {
         _ = sigint.recv() => {
             println!("Received SIGINT (Ctrl+C).");
         }
@@ -834,6 +840,6 @@ async fn main() -> anyhow::Result<()> {
             println!("Received SIGHUP (Terminal closed).");
         }
     }
-    // info!("stream closed");
+    info!("stream closed");*/
     Ok(())
 }

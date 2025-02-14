@@ -46,6 +46,8 @@ use {
     },
     tracing::{error, info},
 };
+use crate::kafka::KafkaProducer;
+
 /// Dummy certificate verifier that treats any certificate as valid.
 /// NOTE, such verification is vulnerable to MITM attacks, but convenient for testing.
 #[derive(Debug)]
@@ -513,6 +515,7 @@ impl QuicClientStream {
     async fn process_reader(
         index: usize,
         reader: &mut QuicClientStreamReader,
+        producer: Arc<KafkaProducer>,
     ) {
         println!("Reader {} started!", index);
 
@@ -521,6 +524,7 @@ impl QuicClientStream {
                 Ok((received_msg_id, msg)) => {
                     // println!("Reader {} - Received message {}: {:?}", index, received_msg_id, msg);
                     println!("Reader {} - Received message {}", index, received_msg_id);
+                    producer.send_message("key", msg).await;
                 }
                 Err(err) => {
                     println!("Reader {} - Error: {}", index, err);
@@ -544,13 +548,18 @@ impl Stream for QuicClientStream {
             return Poll::Ready(None);
         }
 
+        // let kafka_brokers = "172.24.112.1:9093";
+        let kafka_brokers = "host.docker.internal:9095";
+        let topic = "magicv0";
+        let producer = Arc::new(KafkaProducer::new(kafka_brokers, topic));
+
         // 启动每个 reader 的异步任务
         while let Some(mut reader) = me.readers.pop() {
             let index = *me.index; // 当前 reader 的索引
             *me.index += 1;
-
+            let producer = Arc::clone(&producer);
             tokio::spawn(async move {
-                QuicClientStream::process_reader(index, &mut reader).await;
+                QuicClientStream::process_reader(index, &mut reader, producer).await;
             });
         }
 
